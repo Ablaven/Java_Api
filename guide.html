@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Full Stack Mastery: Complete Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-app: #0f172a;
+        --bg-panel: #1e293b;
+        --text-main: #f1f5f9;
+        --text-muted: #94a3b8;
+        --accent: #3b82f6;
+        --success: #10b981;
+        --error: #ef4444;
+        --border: #334155;
+        --code-bg: #020617;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-app);
+        color: var(--text-main);
+        margin: 0;
+        padding-bottom: 120px; /* Space for bottom nav */
+        line-height: 1.6;
+    }
+
+    /* --- STICKY HEADER --- */
+    .header {
+        position: sticky;
+        top: 0;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+        padding: 15px 20px;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .progress-track {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: transparent;
+    }
+    .progress-fill {
+        height: 100%;
+        background: var(--success);
+        width: 0%;
+        transition: width 0.4s ease;
+        box-shadow: 0 0 10px var(--success);
+    }
+
+    /* --- CONTAINER --- */
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        font-weight: 800;
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+        background: linear-gradient(to right, #fff, #cbd5e1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .subtitle {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 30px;
+    }
+
+    /* --- ACCORDION MODULES --- */
+    .module {
+        background: var(--bg-panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        margin-bottom: 15px;
+        overflow: hidden;
+        transition: border-color 0.3s;
+    }
+
+    .module.read {
+        border-color: var(--success);
+    }
+
+    .module-header {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        font-weight: 600;
+        background: rgba(255,255,255,0.02);
+        user-select: none;
+    }
+    .module-header:hover { background: rgba(255,255,255,0.05); }
+
+    .module-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease-out;
+        background: var(--bg-app);
+    }
+    
+    .module.open .module-content {
+        max-height: 8000px; /* Big number to fit content */
+        border-top: 1px solid var(--border);
+    }
+
+    .content-pad { padding: 20px; }
+
+    /* --- CONTENT STYLING --- */
+    h2 { color: var(--text-main); margin-top: 0; font-size: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 10px;}
+    h3 { color: var(--accent); margin-top: 25px; font-size: 1.1rem; }
+    
+    p, li { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 12px; }
+    strong { color: var(--text-main); font-weight: 700; }
+
+    /* Code Blocks */
+    pre {
+        background: var(--code-bg);
+        padding: 15px;
+        border-radius: 8px;
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        margin: 15px 0;
+    }
+    code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        color: #e2e8f0;
+    }
+
+    /* Visual Aids */
+    .diagram-placeholder {
+        background: #000;
+        border: 1px dashed var(--text-muted);
+        padding: 15px;
+        text-align: center;
+        border-radius: 8px;
+        margin: 20px 0;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+
+    /* Buttons */
+    .mark-read-btn {
+        width: 100%;
+        padding: 12px;
+        margin-top: 20px;
+        background: var(--bg-panel);
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .mark-read-btn.done {
+        background: var(--success);
+        color: black;
+        border-color: var(--success);
+        pointer-events: none;
+    }
+
+    .start-quiz-btn {
+        display: none; /* Hidden until complete */
+        width: 100%;
+        padding: 16px;
+        background: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-top: 30px;
+        cursor: pointer;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.02);} 100% {transform: scale(1);} }
+
+    /* --- QUIZ MODAL --- */
+    .quiz-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: var(--bg-app);
+        z-index: 200;
+        display: none;
+        flex-direction: column;
+        padding: 20px;
+        overflow-y: auto;
+    }
+    .quiz-overlay.active { display: flex; }
+
+    .quiz-card {
+        background: var(--bg-panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 25px;
+        max-width: 600px;
+        width: 100%;
+        margin: auto;
+    }
+
+    .q-header { display: flex; justify-content: space-between; margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem; }
+    .q-text { font-size: 1.2rem; font-weight: 700; color: white; margin-bottom: 25px; }
+    
+    .option-btn {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 15px;
+        margin-bottom: 10px;
+        background: var(--bg-app);
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .option-btn.correct { background: rgba(16, 185, 129, 0.2); border-color: var(--success); color: white; }
+    .option-btn.wrong { background: rgba(239, 68, 68, 0.2); border-color: var(--error); color: white; }
+
+    .hard-tag {
+        display: inline-block;
+        background: rgba(239, 68, 68, 0.2);
+        color: var(--error);
+        font-size: 0.7rem;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div style="font-weight:700;">FullStack Guide</div>
+    <div style="font-size:0.8rem; color:var(--text-muted);" id="progressText">0/7 Modules</div>
+    <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
+</div>
+
+<div class="container">
+    <h1>Complete Code Breakdown</h1>
+    <p class="subtitle">Read all modules to unlock the certification exam.</p>
+
+    <div class="module" id="mod1">
+        <div class="module-header" onclick="toggleModule('mod1')">
+            <span>1. Concept & Architecture</span>
+            <span>▼</span>
+        </div>
+        <div class="module-content">
+            <div class="content-pad">
+                <h2>🌐 What is a Web Application?</h2>
+                <p>Think of our dashboard like a restaurant:</p>
+                <ul>
+                    <li><strong>Frontend</strong> = The dining room where customers sit and see the menu</li>
+                    <li><strong>Backend</strong> = The kitchen where food is prepared</li>
+                    <li><strong>Database</strong> = The pantry where ingredients are stored</li>
+                    <li><strong>API</strong> = The waiter who takes orders from dining room to kitchen and brings food back</li>
+                </ul>
+                
+                
+
+                <h3>📁 File Structure Explained</h3>
+                <pre><code>htdocs/dashboard/            ← Main folder (like a house)
+├── index.html             ← The front door (what users see first)
+├── style.css              ← The interior design (makes things pretty)
+├── script.js              ← The electrical system (makes things work)
+├── api.php                ← The kitchen (processes requests)
+└── database_setup.sql     ← The blueprint for storage rooms</code></pre>
+                <button class="mark-read-btn" onclick="markRead('mod1')">Mark as Read</button>
+            </div>
+        </div>
+    </div>
+    <div class="module" id="mod3">
+        <div class="module-header" onclick="toggleModule('mod3')">
+            <span>3. JavaScript (Logic)</span>
+            <span>▼</span>
+        </div>
+        <div class="module-content">
+            <div class="content-pad">
+                <h2>🔧 JavaScript - The Brain (script.js)</h2>
+                <p>JavaScript makes websites interactive, like adding electricity to a house.</p>
+                
+                <h3>Variables - Storage Boxes</h3>
+                <pre><code>let dashboardData = [];  ← Empty box labeled "dashboardData"
+let currentTableType = 'business';  ← Box containing text "business"</code></pre>
+                
+                <h3>Functions - Recipe Instructions</h3>
+                <pre><code>function loadData() {      ← Recipe called "loadData"
+    // Steps to follow when someone calls this recipe
+}</code></pre>
+
+                <h3>Event Listeners - Motion Sensors</h3>
+                <pre><code>button.addEventListener('click', loadData);</code></pre>
+                <p>Translation: "When someone clicks this button, follow the loadData recipe"</p>
+                <button class="mark-read-btn" onclick="markRead('mod3')">Mark as Read</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="module" id="mod4">
+        <div class="module-header" onclick="toggleModule('mod4')">
+            <span>4. Fetch & JSON</span>
+            <span>▼</span>
+        </div>
+        <div class="module-content">
+            <div class="content-pad">
+                <h2>What is Fetch? - The Messenger</h2>
+                <p>fetch() is like sending a text message to the backend:</p>
+                <pre><code>const response = await fetch('api.php?endpoint=business_data');</code></pre>
+                
+                
+
+                <p>Step by step:</p>
+                <ol>
+                    <li>Send message to api.php asking for business data</li>
+                    <li>Wait for response (that's what <code>await</code> does)</li>
+                    <li>Receive answer from backend</li>
+                    <li>Convert answer from JSON text to JavaScript objects</li>
+                </ol>
+
+                <h3>What is JSON?</h3>
+                <p>JSON is like a universal language for computers:</p>
+                <pre><code>{
+    "id": 1,
+    "name": "John",
+    "salary": 50000
+}</code></pre>
+                <p>It's just text that follows specific rules, like writing addresses on envelopes.</p>
+                <button class="mark-read-btn" onclick="markRead('mod4')">Mark as Read</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="module" id="mod5">
+        <div class="module-header" onclick="toggleModule('mod5')">
+            <span>5. Backend (PHP)</span>
+            <span>▼</span>
+        </div>
+        <div class="module-content">
+            <div class="content-pad">
+                <h2>🍳 Backend - The Kitchen (api.php)</h2>
+                <p>PHP runs on the server (the computer hosting the website), not in user's browser.</p>
+                
+                <h3>What is an API Endpoint?</h3>
+                <p>An API endpoint is like a specific phone number for different services:</p>
+                <ul>
+                    <li><code>api.php?endpoint=employees</code> = "Call employee department"</li>
+                    <li><code>api.php?endpoint=products</code> = "Call inventory department"</li>
+                    <li><code>api.php?endpoint=analytics</code> = "Call statistics department"</li>
+                </ul>
+
+                <h3>How PHP Works:</h3>
+                <pre><code>&lt;?php  ← Start PHP code
+// Everything between these tags runs on server
+
+$endpoint = $_GET['endpoint'] ?? 'business_data';</code></pre>
+                <p>Breaking this down:</p>
+                <ul>
+                    <li><code>$endpoint</code> = Create a variable (box) called "endpoint"</li>
+                    <li><code>$_GET['endpoint']</code> = Look at the website address for ?endpoint=something</li>
+                    <li><code>??</code> = "If that doesn't exist..."</li>
+                    <li><code>'business_data'</code> = "...use this default value instead"</li>
+                </ul>
+
+                <h3>Database Connection - Plugging Into Storage</h3>
+                <pre><code>$pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);</code></pre>
+                <p>What this does:</p>
+                <ul>
+                    <li>PDO = PHP Data Objects (a tool for talking to databases)</li>
+                    <li>mysql:host=localhost = "Connect to MySQL database on this computer"</li>
+                    <li>dbname=dashboard_db = "Open the 'dashboard_db' storage room"</li>
+                    <li>charset=utf8 = "Use international character encoding"</li>
+                </ul>
+                <button class="mark-read-btn" onclick="markRead('mod5')">Mark as Read</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="module" id="mod6">
+        <div class="module-header" onclick="toggleModule('mod6')">
+            <span>6. Database & SQL</span>
+            <span>▼</span>
+        </div>
+        <div class="module-content">
+            <div class="content-pad">
+                <h2>🗄️ Database - The Storage System</h2>
+                <h3>What is MySQL?</h3>
+                <p>MySQL is like a giant, organized filing cabinet:</p>
+                <ul>
+                    <li><strong>Database</strong> = The entire filing cabinet</li>
+                    <li><strong>Tables</strong> = Individual drawers</li>
+                    <li><strong>Columns</strong> = Categories in each drawer (Name, Age, etc.)</li>
+                    <li><strong>Rows</strong> = Individual records (one person's information)</li>
+                </ul>
+
+                
+
+[Image of relational database table structure diagram]
+
+
+                <h3>SQL Commands:</h3>
+                <pre><code>CREATE TABLE employees (      ← Make a new drawer called "employees"
+    id INT AUTO_INCREMENT PRIMARY KEY,  ← Automatic numbering system
+    name VARCHAR(100) NOT NULL,          ← Text field, required
+    salary DECIMAL(10,2) NOT NULL        ← Number with 2 decimal places
+);</code></pre>
+
+                <p>Field Types Explained:</p>
+                <ul>
+                    <li>INT = Whole numbers (1, 2, 3...)</li>
+                    <li>VARCHAR(100) = Text up to 100 characters</li>
+                    <li>DECIMAL(10,2) = Numbers like 12345678.99 (10 total digits, 2 after decimal)</li>
+                    <li>DATE = Dates like 2024-01-15</li>
+                    <li>TEXT = Long text (like paragraphs)</li>
+                </ul>
+                <button class="mark-read-btn" onclick="markRead('mod6')">Mark as Read</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="module" id="mod7">
+        <div class="module-header" onclick="toggleModule('mod7')">
+            <span>7. Chart.js & Layouts</span>
+            <span>▼</span>
+        </div>
+        <div class="module-content">
+            <div class="content-pad">
+                <h2>📊 Chart.js - The Art Department</h2>
+                <p>Chart.js is a free library (pre-made code) that draws pretty charts.</p>
+                <pre><code>new Chart(ctx, {            ← Create new chart
+    type: 'pie',            ← What kind of chart (pie, bar, line...)
+    data: {                 ← What information to show
+        labels: ['Sales', 'Marketing', 'Operations'],  ← Names for sections
+        datasets: [{         ← The actual numbers
+            data: [1200, 800, 600],  ← Values for each section
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']  ← Colors
+        }]
+    },
+    options: {              ← How chart should behave
+        responsive: true    ← Adjust size automatically
+    }
+});</code></pre>
+
+                <h3>Canvas Element:</h3>
+                <pre><code>&lt;canvas id="myChart"&gt;&lt;/canvas&gt;</code></pre>
+                <p>Canvas is like a blank piece of paper where Chart.js draws. You can't draw on it with HTML/CSS - you need JavaScript.</p>
+
+                <h3>Responsive Design</h3>
+                <pre><code>@media (max-width: 768px) {    ← When screen is smaller than 768px
+    .dashboard {
+        grid-template-columns: 1fr;  ← Switch to single column
+    }
+}</code></pre>
+                <button class="mark-read-btn" onclick="markRead('mod7')">Mark as Read</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="module" id="mod8">
+        <div class="module-header" onclick="toggleModule('mod8')">
+            <span>8. Lifecycle, Security & Debugging</span>
+            <span>▼</span>
+        </div>
+        <div class="module-content">
+            <div class="content-pad">
+                <h2>🔄 How Everything Works Together</h2>
+                
+                
+
+[Image of full stack web application data flow diagram]
+
+
+                <p><strong>The Complete Journey:</strong></p>
+                <ol>
+                    <li>User opens website - Browser downloads index.html - HTML tells browser to also get style.css and script.js - Chart.js library downloads from internet</li>
+                    <li>Page loads - script.js runs: document.addEventListener('DOMContentLoaded', function() {...}) - This means: "Wait until page is fully loaded, then do this"</li>
+                    <li>Data loading begins - JavaScript calls loadData() function - fetch('api.php?endpoint=business_data') sends request to server</li>
+                    <li>Server processes request - Apache web server receives request - Passes it to PHP interpreter - PHP code in api.php runs - PHP connects to MySQL database - Executes SQL query: SELECT id, date, category, value, note FROM business_data - Database returns rows of data - PHP converts data to JSON format - Sends JSON back to browser</li>
+                    <li>Browser receives data - JavaScript receives response - response.json() converts JSON text to JavaScript objects - updateTable(data) puts data into HTML table - updateBusinessCharts(data) draws charts</li>
+                    <li>User interaction - User clicks cell in table - contentEditable="true" allows editing - When user clicks elsewhere: blur event fires - JavaScript sends UPDATE request to api.php - PHP updates database - Charts refresh with new data</li>
+                </ol>
+
+                <h2>🔧 Key Programming Concepts</h2>
+                <h3>Asynchronous Programming (async/await):</h3>
+                <pre><code>async function loadData() {         ← This function can wait for things
+    const response = await fetch('api.php');  ← Wait for server response
+    const data = await response.json();       ← Wait for JSON conversion
+}</code></pre>
+                <p>Why this matters: Internet requests take time. Without await, JavaScript would continue before getting response.</p>
+
+                <h2>🚀 XAMPP - The Development Environment</h2>
+                <p>XAMPP is like a complete restaurant kitchen for your computer:</p>
+                <ul>
+                    <li>X = Cross-platform (works on Windows, Mac, Linux)</li>
+                    <li>A = Apache (web server - serves your website)</li>
+                    <li>M = MySQL (database server - stores your data)</li>
+                    <li>P = PHP (programming language - processes requests)</li>
+                </ul>
+                
+                <h2>🔐 Security Features</h2>
+                <h3>Prepared Statements:</h3>
+                <pre><code>$stmt = $pdo-&gt;prepare('UPDATE business_data SET value = :value WHERE id = :id');
+$stmt-&gt;execute([':value' =&gt; $newValue, ':id' =&gt; $recordId]);</code></pre>
+                <p>Prevents SQL injection attacks where hackers try to run malicious database commands.</p>
+
+                <h2>🔍 Debugging</h2>
+                <pre><code>console.error('Error loading data:', error);  ← Write to browser console</code></pre>
+                <p>Press F12 in browser to see console - shows errors and debug messages.</p>
+
+                <button class="mark-read-btn" onclick="markRead('mod8')">Mark as Read</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="startQuizBtn" class="start-quiz-btn" onclick="startQuiz()">📝 Start Certification Exam</button>
+</div>
+
+<div class="quiz-overlay" id="quizOverlay">
+    <div class="quiz-card">
+        <div class="q-header">
+            <span id="qProgress">Question 1/10</span>
+            <span onclick="closeQuiz()" style="cursor:pointer">Exit</span>
+        </div>
+        
+        <div id="questionContainer">
+            <div id="hardLabel" class="hard-tag" style="display:none;">⚠️ Critical Thinking</div>
+            <div class="q-text" id="qText">...</div>
+            <div id="optionsArea"></div>
+        </div>
+
+        <div id="resultContainer" style="display:none; text-align:center;">
+            <div style="font-size:3rem; margin-bottom:10px;">🏁</div>
+            <h2>Exam Complete</h2>
+            <p id="scoreText" style="color:white; font-size:1.5rem; margin:20px 0;">Score: 0/10</p>
+            <button class="mark-read-btn" onclick="closeQuiz()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- STATE MANAGEMENT ---
+    const totalModules = 7;
+    let readModules = new Set();
+
+    function toggleModule(id) {
+        const module = document.getElementById(id);
+        const content = module.querySelector('.module-content');
+        const isOpen = module.classList.contains('open');
+
+        if (isOpen) {
+            module.classList.remove('open');
+        } else {
+            module.classList.add('open');
+        }
+    }
+
+    function markRead(id) {
+        const btn = document.querySelector(`#${id} .mark-read-btn`);
+        const module = document.getElementById(id);
+        
+        if(!readModules.has(id)) {
+            readModules.add(id);
+            btn.classList.add('done');
+            btn.innerText = "✅ Read";
+            module.classList.add('read');
+            
+            // Update Progress
+            const pct = (readModules.size / totalModules) * 100;
+            document.getElementById('progressBar').style.width = `${pct}%`;
+            document.getElementById('progressText').innerText = `${readModules.size}/${totalModules} Modules`;
+
+            if(readModules.size === totalModules) {
+                document.getElementById('startQuizBtn').style.display = 'block';
+                // Scroll to bottom smoothly
+                setTimeout(() => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}), 500);
+            }
+        }
+        // Auto collapse after reading
+        toggleModule(id);
+    }
+
+    // --- QUIZ DATA (Backend/Logic/DB Only) ---
+    const questions = [
+        {
+            q: "In the restaurant analogy, what represents the API?",
+            options: ["The Kitchen", "The Waiter", "The Dining Room", "The Pantry"],
+            correct: 1
+        },
+        {
+            q: "Where does PHP code execute?",
+            options: ["In the user's browser", "In the style.css file", "On the Server", "Inside the database"],
+            correct: 2
+        },
+        {
+            q: "What is the specific purpose of an API Endpoint?",
+            options: ["To act as a phone number for specific services", "To style the page", "To store variables", "To draw charts"],
+            correct: 0
+        },
+        {
+            q: "What does the 'await' keyword do in JavaScript?",
+            options: ["Stops the script forever", "Waits for a server response before continuing", "Makes the internet faster", "Deletes the database"],
+            correct: 1
+        },
+        {
+            q: "Why do we use Prepared Statements?",
+            options: ["To make code shorter", "To prevent SQL Injection attacks", "To format JSON", "To connect to XAMPP"],
+            correct: 1
+        },
+        {
+            q: "In a database, what is a 'Row'?",
+            options: ["A category like Name or Age", "An entire filing cabinet", "A single person's complete record", "A command to delete data"],
+            correct: 2
+        },
+        {
+            q: "Which HTTP status code means 'Success'?",
+            options: ["404", "500", "200", "403"],
+            correct: 2 // Implicit knowledge from 'check if response.ok'
+        },
+        {
+            q: "What is the role of 'fetch()'?",
+            options: ["To send messages to the backend", "To create HTML elements", "To style buttons", "To start the Apache server"],
+            correct: 0
+        },
+        // CRITICAL THINKING
+        {
+            q: "CRITICAL THINKING: You click a button that runs a fetch() request. If you forgot to write 'await' before the fetch, what happens?",
+            options: ["The browser crashes", "The code waits politely", "The code continues running immediately, likely causing an error because the data hasn't arrived yet", "The server refuses the connection"],
+            correct: 2
+        },
+        {
+            q: "CRITICAL THINKING: A user updates a table cell. The 'blur' event triggers the JS to send an UPDATE request. If the PHP file crashes during this request, does the Database get updated?",
+            options: ["Yes, the browser forces the update", "No, because the PHP code on the server failed to execute the SQL command", "Yes, MySQL updates itself automatically", "No, but the CSS will change"],
+            correct: 1
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+
+    function startQuiz() {
+        document.getElementById('quizOverlay').classList.add('active');
+        currentQ = 0;
+        score = 0;
+        document.getElementById('questionContainer').style.display = 'block';
+        document.getElementById('resultContainer').style.display = 'none';
+        renderQuestion();
+    }
+
+    function closeQuiz() {
+        document.getElementById('quizOverlay').classList.remove('active');
+    }
+
+    function renderQuestion() {
+        const q = questions[currentQ];
+        document.getElementById('qProgress').innerText = `Question ${currentQ + 1}/10`;
+        document.getElementById('qText').innerText = q.q;
+        
+        // Hard Tag
+        if(currentQ >= 8) document.getElementById('hardLabel').style.display = 'inline-block';
+        else document.getElementById('hardLabel').style.display = 'none';
+
+        const area = document.getElementById('optionsArea');
+        area.innerHTML = '';
+
+        q.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(idx, btn);
+            area.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(idx, btn) {
+        // Disable clicks
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.onclick = null);
+
+        const correctIdx = questions[currentQ].correct;
+        
+        if(idx === correctIdx) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            btns[correctIdx].classList.add('correct');
+        }
+
+        setTimeout(() => {
+            currentQ++;
+            if(currentQ < questions.length) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }, 1500);
+    }
+
+    function showResult() {
+        document.getElementById('questionContainer').style.display = 'none';
+        document.getElementById('resultContainer').style.display = 'block';
+        document.getElementById('scoreText').innerText = `Score: ${score} / 10`;
+    }
+
+</script>
+
+</body>
+</html>
